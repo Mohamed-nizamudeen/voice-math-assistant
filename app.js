@@ -57,7 +57,7 @@ function processCommand(text) {
   } else if (/sqrt|square root/.test(text)) {
     result = Math.sqrt(a); operationName = 'Square Root';
   } else if(/love|gopika|nizam/.test(text)){
-  showResult('I love you💜');
+  showResult('I love you Fathima princess Chellam💜');
   return;
   } else {
     showResult(' Operation not understood. Try: add, subtract, multiply, divide, power, modulo');
