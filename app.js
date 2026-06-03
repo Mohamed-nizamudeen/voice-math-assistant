@@ -15,16 +15,32 @@ function processCommand(text) {
   text = text.toLowerCase().trim();
   recognizedEl.textContent = text;
 
+  // Number word map
   const wordMap = {
-    'zero':0,'one':1,'two':2,'three':3,'four':4,'five':5,
-    'six':6,'seven':7,'eight':8,'nine':9,'ten':10,
-    'eleven':11,'twelve':12,'twenty':20,'thirty':30,'hundred':100
+    'zero': 0,
+    'one': 1,
+    'two': 2,
+    'three': 3,
+    'four': 4,
+    'five': 5,
+    'six': 6,
+    'seven': 7,
+    'eight': 8,
+    'nine': 9,
+    'ten': 10,
+    'eleven': 11,
+    'twelve': 12,
+    'twenty': 20,
+    'thirty': 30,
+    'hundred': 100
   };
 
+  // Replace word numbers
   Object.keys(wordMap).forEach(word => {
     text = text.replace(new RegExp(`\\b${word}\\b`, 'g'), wordMap[word]);
   });
 
+  // Extract numbers
   const numbers = text.match(/-?\d+(\.\d+)?/g);
 
   if (!numbers || numbers.length < 1) {
@@ -39,12 +55,13 @@ function processCommand(text) {
   let operationName;
   let output;
 
-  // One-number operations
+  // ─── One-number operations ────────────────────────────────
   if (/sqrt|square root|√/.test(text)) {
     if (a < 0) {
       showResult('❌ Square root is not possible for negative numbers!');
       return;
     }
+
     result = Math.sqrt(a);
     operationName = 'Square Root';
     output = `${operationName} of ${a} = ${result}`;
@@ -69,6 +86,7 @@ function processCommand(text) {
       showResult('❌ Natural log is only possible for positive numbers!');
       return;
     }
+
     result = Math.log(a);
     operationName = 'Natural Log';
     output = `${operationName} of ${a} = ${result}`;
@@ -78,6 +96,7 @@ function processCommand(text) {
       showResult('❌ Log is only possible for positive numbers!');
       return;
     }
+
     result = Math.log10(a);
     operationName = 'Log Base 10';
     output = `${operationName} of ${a} = ${result}`;
@@ -109,6 +128,7 @@ function processCommand(text) {
     }
 
     let fact = 1;
+
     for (let i = 1; i <= a; i++) {
       fact *= i;
     }
@@ -118,7 +138,7 @@ function processCommand(text) {
     output = `${operationName} of ${a} = ${result}`;
 
   } else {
-    // Two-number operations
+    // ─── Two-number operations ───────────────────────────────
     if (b === null) {
       showResult('❌ This operation needs two numbers. Try: add 5 and 3');
       return;
@@ -141,6 +161,7 @@ function processCommand(text) {
         showResult('❌ Cannot divide by zero!');
         return;
       }
+
       result = a / b;
       operationName = 'Division';
 
@@ -172,12 +193,21 @@ function processCommand(text) {
     output = `${operationName} of ${a} and ${b} = ${result}`;
   }
 
+  // Round to 4 decimal places
   result = Math.round(result * 10000) / 10000;
+
+  // Update history output after rounding
+  if (b === null) {
+    output = `${operationName} of ${a} = ${result}`;
+  } else {
+    output = `${operationName} of ${a} and ${b} = ${result}`;
+  }
 
   showResult(`Result: ${result}`);
   saveHistory(output);
   lastResult = `The answer is ${result}`;
 }
+
 // ─── 2. DISPLAY RESULT ──────────────────────────────────────
 function showResult(text) {
   resultEl.textContent = text;
@@ -200,7 +230,7 @@ if (SpeechRecognition) {
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
     textInput.value = transcript;
-    micBtn.textContent = ' Speak';
+    micBtn.textContent = 'Speak';
     processCommand(transcript);
   };
 
@@ -216,33 +246,45 @@ if (SpeechRecognition) {
 // ─── 4. VOICE OUTPUT (Text to Speech) ───────────────────────
 speakBtn.addEventListener('click', () => {
   if (!lastResult) return;
+
   const utterance = new SpeechSynthesisUtterance(lastResult);
   utterance.lang = 'en-US';
   utterance.rate = 0.95;
+
   window.speechSynthesis.speak(utterance);
 });
 
 // ─── 5. TEXT INPUT ──────────────────────────────────────────
 sendBtn.addEventListener('click', () => {
-  if (textInput.value.trim()) processCommand(textInput.value);
+  if (textInput.value.trim()) {
+    processCommand(textInput.value);
+  }
 });
 
 textInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') processCommand(textInput.value);
+  if (e.key === 'Enter') {
+    processCommand(textInput.value);
+  }
 });
 
 // ─── 6. HISTORY ─────────────────────────────────────────────
 function saveHistory(entry) {
   const time = new Date().toLocaleTimeString();
   const stored = JSON.parse(localStorage.getItem('mathHistory') || '[]');
+
   stored.unshift({ entry, time });
-  if (stored.length > 50) stored.pop();        // Max 50 entries
+
+  if (stored.length > 50) {
+    stored.pop();
+  }
+
   localStorage.setItem('mathHistory', JSON.stringify(stored));
   renderHistory(stored);
 }
 
 function renderHistory(stored) {
   historyList.innerHTML = '';
+
   stored.forEach(item => {
     const li = document.createElement('li');
     li.textContent = `🕐 ${item.time}  →  ${item.entry}`;
