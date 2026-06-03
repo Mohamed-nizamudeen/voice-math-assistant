@@ -45,21 +45,46 @@ function processCommand(text) {
     result = a + b; operationName = 'Addition';
   } else if (/sub|minus|subtract|difference/.test(text)) {
     result = a - b; operationName = 'Subtraction';
-  } else if (/mul|times|product|into/.test(text)) {
+  } else if (/mul|times|product|into/.test(text)) {  
     result = a * b; operationName = 'Multiplication';
-  } else if (/div|divided|divide|quotient|over/.test(text)) {
+  } else if (/div|divided|divide|quotient|over/.test(text)) { 
     if (b === 0) { showResult(' Cannot divide by zero!'); return; }
     result = a / b; operationName = 'Division';
   } else if (/mod|modulo|remainder/.test(text)) {
     result = a % b; operationName = 'Modulo';
   } else if (/pow|power|exponent/.test(text)) {
     result = Math.pow(a, b); operationName = 'Power';
-  } else if (/sqrt|square root/.test(text)) {
+  } else if (/sqrt|square root|√/.test(text)) {
     result = Math.sqrt(a); operationName = 'Square Root';
-  } else if(/love|gopika|nizam/.test(text)){
-  showResult('I love you Fathima princess Chellam💜');
-  return;
-  } else {
+   } else if (/sin|sine/.test(text)) {
+    result = Math.sin(a * Math.PI / 180); operationName = 'Sine';
+  } else if (/cos|cosine/.test(text)) {
+    result = Math.cos(a * Math.PI / 180); operationName = 'Cosine';
+  } else if (/tan|tangent/.test(text)) {
+    result = Math.tan(a * Math.PI / 180); operationName = 'Tangent';
+  } else if (/log|logarithm/.test(text)) {
+    if (a <= 0) { showResult(' Log is only possible for positive numbers!'); return; }
+    result = Math.log10(a);operationName = 'Log Base 10';
+  } else if (/ln|natural log/.test(text)) {
+    if (a <= 0) { showResult(' Natural log is only possible for positive numbers!'); return; }
+    result = Math.log(a);operationName = 'Natural Log';
+  } else if (/abs|absolute/.test(text)) {
+    result = Math.abs(a);operationName = 'Absolute Value';
+  } else if (/percent|percentage/.test(text)) {
+    result = (a / 100) * b; operationName = 'Percentage';
+  } else if (/max|maximum|larger/.test(text)) {
+    result = Math.max(a, b);operationName = 'Maximum';
+  } else if (/min|minimum|smaller/.test(text)) {
+    result = Math.min(a, b);operationName = 'Minimum';
+  } else if (/round/.test(text)) {
+    result = Math.round(a);operationName = 'Round';
+  } else if (/floor/.test(text)) {
+    result = Math.floor(a);
+    operationName = 'Floor';
+  } else if (/ceil|ceiling/.test(text)) {
+    result = Math.ceil(a);operationName = 'Ceiling';
+      
+  else {
     showResult(' Operation not understood. Try: add, subtract, multiply, divide, power, modulo');
     return;
   }
@@ -94,17 +119,17 @@ if (SpeechRecognition) {
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
     textInput.value = transcript;
-    micBtn.textContent = '🎤 Speak';
+    micBtn.textContent = ' Speak';
     processCommand(transcript);
   };
 
   recognition.onerror = () => {
-    micBtn.textContent = '🎤 Speak';
-    showResult('❌ Mic error. Try Chrome browser.');
+    micBtn.textContent = 'Speak';
+    showResult('Try Chrome browser.');
   };
 } else {
   micBtn.disabled = true;
-  micBtn.textContent = '🎤 Not supported';
+  micBtn.textContent = 'Not supported';
 }
 
 // ─── 4. VOICE OUTPUT (Text to Speech) ───────────────────────
