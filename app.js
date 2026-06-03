@@ -30,9 +30,9 @@ function processCommand(text) {
   // Extract numbers
   const numbers = text.match(/-?\d+(\.\d+)?/g);
 
-  if (!numbers || numbers.length < 2) {
-    showResult('❌ Could not find two numbers. Try: "add 5 and 3"');
-    return;
+  if (!numbers || numbers.length < 1) {
+  showResult('❌ Could not find a number.');
+  return;
   }
 
   const a = parseFloat(numbers[0]);
@@ -41,7 +41,7 @@ function processCommand(text) {
   let operationName;
 
   // Detect operation
-  if (/add|plus|sum|and/.test(text)) {
+  if (/add|plus|sum/.test(text)) {
     result = a + b; operationName = 'Addition';
   } else if (/sub|minus|subtract|difference/.test(text)) {
     result = a - b; operationName = 'Subtraction';
@@ -90,14 +90,12 @@ function processCommand(text) {
   for (let i = 1; i <= a; i++) {
     fact *= i;
   }
-
   result = fact;
   operationName = 'Factorial';
   }else {
     showResult(' Operation not understood. Try: add, subtract, multiply, divide, power, modulo');
     return;
   }
-
   // Round to 4 decimal places
   result = Math.round(result * 10000) / 10000;
   const output = `${operationName} of ${a} and ${b} = ${result}`;
