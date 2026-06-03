@@ -15,95 +15,169 @@ function processCommand(text) {
   text = text.toLowerCase().trim();
   recognizedEl.textContent = text;
 
-  // Number word map
   const wordMap = {
     'zero':0,'one':1,'two':2,'three':3,'four':4,'five':5,
     'six':6,'seven':7,'eight':8,'nine':9,'ten':10,
     'eleven':11,'twelve':12,'twenty':20,'thirty':30,'hundred':100
   };
 
-  // Replace word numbers
   Object.keys(wordMap).forEach(word => {
     text = text.replace(new RegExp(`\\b${word}\\b`, 'g'), wordMap[word]);
   });
 
-  // Extract numbers
   const numbers = text.match(/-?\d+(\.\d+)?/g);
 
   if (!numbers || numbers.length < 1) {
-  showResult('❌ Could not find a number.');
-  return;
+    showResult('❌ Could not find a number.');
+    return;
   }
 
   const a = parseFloat(numbers[0]);
-  const b = parseFloat(numbers[1]);
+  const b = numbers.length >= 2 ? parseFloat(numbers[1]) : null;
+
   let result;
   let operationName;
+  let output;
 
-  // Detect operation
-  if (/add|plus|sum/.test(text)) {
-    result = a + b; operationName = 'Addition';
-  } else if (/sub|minus|subtract|difference/.test(text)) {
-    result = a - b; operationName = 'Subtraction';
-  } else if (/mul|times|product|into/.test(text)) {  
-    result = a * b; operationName = 'Multiplication';
-  } else if (/div|divided|divide|quotient|over/.test(text)) { 
-    if (b === 0) { showResult(' Cannot divide by zero!'); return; }
-    result = a / b; operationName = 'Division';
-  } else if (/mod|modulo|remainder/.test(text)) {
-    result = a % b; operationName = 'Modulo';
-  } else if (/pow|power|exponent/.test(text)) {
-    result = Math.pow(a, b); operationName = 'Power';
-  } else if (/sqrt|square root|√/.test(text)) {
-    result = Math.sqrt(a); operationName = 'Square Root';
-   } else if (/sin|sine/.test(text)) {
-    result = Math.sin(a * Math.PI / 180); operationName = 'Sine';
+  // One-number operations
+  if (/sqrt|square root|√/.test(text)) {
+    if (a < 0) {
+      showResult('❌ Square root is not possible for negative numbers!');
+      return;
+    }
+    result = Math.sqrt(a);
+    operationName = 'Square Root';
+    output = `${operationName} of ${a} = ${result}`;
+
+  } else if (/sin|sine/.test(text)) {
+    result = Math.sin(a * Math.PI / 180);
+    operationName = 'Sine';
+    output = `${operationName} of ${a} = ${result}`;
+
   } else if (/cos|cosine/.test(text)) {
-    result = Math.cos(a * Math.PI / 180); operationName = 'Cosine';
+    result = Math.cos(a * Math.PI / 180);
+    operationName = 'Cosine';
+    output = `${operationName} of ${a} = ${result}`;
+
   } else if (/tan|tangent/.test(text)) {
-    result = Math.tan(a * Math.PI / 180); operationName = 'Tangent';
-  } else if (/log|logarithm/.test(text)) {
-    if (a <= 0) { showResult(' Log is only possible for positive numbers!'); return; }
-    result = Math.log10(a);operationName = 'Log Base 10';
+    result = Math.tan(a * Math.PI / 180);
+    operationName = 'Tangent';
+    output = `${operationName} of ${a} = ${result}`;
+
   } else if (/ln|natural log/.test(text)) {
-    if (a <= 0) { showResult(' Natural log is only possible for positive numbers!'); return; }
-    result = Math.log(a);operationName = 'Natural Log';
+    if (a <= 0) {
+      showResult('❌ Natural log is only possible for positive numbers!');
+      return;
+    }
+    result = Math.log(a);
+    operationName = 'Natural Log';
+    output = `${operationName} of ${a} = ${result}`;
+
+  } else if (/log|logarithm/.test(text)) {
+    if (a <= 0) {
+      showResult('❌ Log is only possible for positive numbers!');
+      return;
+    }
+    result = Math.log10(a);
+    operationName = 'Log Base 10';
+    output = `${operationName} of ${a} = ${result}`;
+
   } else if (/abs|absolute/.test(text)) {
-    result = Math.abs(a);operationName = 'Absolute Value';
-  } else if (/percent|percentage/.test(text)) {
-    result = (a / 100) * b; operationName = 'Percentage';
-  } else if (/max|maximum|larger/.test(text)) {
-    result = Math.max(a, b);operationName = 'Maximum';
-  } else if (/min|minimum|smaller/.test(text)) {
-    result = Math.min(a, b);operationName = 'Minimum';
+    result = Math.abs(a);
+    operationName = 'Absolute Value';
+    output = `${operationName} of ${a} = ${result}`;
+
   } else if (/round/.test(text)) {
-    result = Math.round(a);operationName = 'Round';
+    result = Math.round(a);
+    operationName = 'Round';
+    output = `${operationName} of ${a} = ${result}`;
+
   } else if (/floor/.test(text)) {
     result = Math.floor(a);
     operationName = 'Floor';
-  } else if (/ceil|ceiling/.test(text)) {
-    result = Math.ceil(a);operationName = 'Ceiling';
-    } else if (/factorial|fact/.test(text)) {
-  if (a < 0) { showResult(' Factorial is not possible for negative numbers!'); return; }
+    output = `${operationName} of ${a} = ${result}`;
 
-  let fact = 1;
-  for (let i = 1; i <= a; i++) {
-    fact *= i;
+  } else if (/ceil|ceiling/.test(text)) {
+    result = Math.ceil(a);
+    operationName = 'Ceiling';
+    output = `${operationName} of ${a} = ${result}`;
+
+  } else if (/factorial|fact/.test(text)) {
+    if (a < 0 || !Number.isInteger(a)) {
+      showResult('❌ Factorial is only possible for positive whole numbers!');
+      return;
+    }
+
+    let fact = 1;
+    for (let i = 1; i <= a; i++) {
+      fact *= i;
+    }
+
+    result = fact;
+    operationName = 'Factorial';
+    output = `${operationName} of ${a} = ${result}`;
+
+  } else {
+    // Two-number operations
+    if (b === null) {
+      showResult('❌ This operation needs two numbers. Try: add 5 and 3');
+      return;
+    }
+
+    if (/add|plus|sum/.test(text)) {
+      result = a + b;
+      operationName = 'Addition';
+
+    } else if (/sub|minus|subtract|difference/.test(text)) {
+      result = a - b;
+      operationName = 'Subtraction';
+
+    } else if (/mul|times|product|into|multiply/.test(text)) {
+      result = a * b;
+      operationName = 'Multiplication';
+
+    } else if (/div|divided|divide|quotient|over/.test(text)) {
+      if (b === 0) {
+        showResult('❌ Cannot divide by zero!');
+        return;
+      }
+      result = a / b;
+      operationName = 'Division';
+
+    } else if (/mod|modulo|remainder/.test(text)) {
+      result = a % b;
+      operationName = 'Modulo';
+
+    } else if (/pow|power|exponent/.test(text)) {
+      result = Math.pow(a, b);
+      operationName = 'Power';
+
+    } else if (/percent|percentage/.test(text)) {
+      result = (a / 100) * b;
+      operationName = 'Percentage';
+
+    } else if (/max|maximum|larger/.test(text)) {
+      result = Math.max(a, b);
+      operationName = 'Maximum';
+
+    } else if (/min|minimum|smaller/.test(text)) {
+      result = Math.min(a, b);
+      operationName = 'Minimum';
+
+    } else {
+      showResult('❌ Operation not understood. Try: add, subtract, multiply, divide, power, modulo');
+      return;
+    }
+
+    output = `${operationName} of ${a} and ${b} = ${result}`;
   }
-  result = fact;
-  operationName = 'Factorial';
-  }else {
-    showResult(' Operation not understood. Try: add, subtract, multiply, divide, power, modulo');
-    return;
-  }
-  // Round to 4 decimal places
+
   result = Math.round(result * 10000) / 10000;
-  const output = `${operationName} of ${a} and ${b} = ${result}`;
+
   showResult(`Result: ${result}`);
   saveHistory(output);
   lastResult = `The answer is ${result}`;
 }
-
 // ─── 2. DISPLAY RESULT ──────────────────────────────────────
 function showResult(text) {
   resultEl.textContent = text;
