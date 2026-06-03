@@ -83,8 +83,17 @@ function processCommand(text) {
     operationName = 'Floor';
   } else if (/ceil|ceiling/.test(text)) {
     result = Math.ceil(a);operationName = 'Ceiling';
-      
-  else {
+    } else if (/factorial|fact/.test(text)) {
+  if (a < 0) { showResult(' Factorial is not possible for negative numbers!'); return; }
+
+  let fact = 1;
+  for (let i = 1; i <= a; i++) {
+    fact *= i;
+  }
+
+  result = fact;
+  operationName = 'Factorial';
+  }else {
     showResult(' Operation not understood. Try: add, subtract, multiply, divide, power, modulo');
     return;
   }
