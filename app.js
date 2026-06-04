@@ -144,15 +144,15 @@ function processCommand(text) {
       return;
     }
 
-    if (/add|plus|sum/.test(text)) {
+    if (/add|plus|sum|+/.test(text)) {
       result = a + b;
       operationName = 'Addition';
 
-    } else if (/sub|minus|subtract|difference/.test(text)) {
+    } else if (/sub|minus|subtract|difference|-/.test(text)) {
       result = a - b;
       operationName = 'Subtraction';
 
-    } else if (/mul|times|product|into|multiply/.test(text)) {
+    } else if (/mul|times|product|into|multiply|*/.test(text)) {
       result = a * b;
       operationName = 'Multiplication';
 
